@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Продажа</title>
+
+<style>
+
+body{
+    background:#1f2937;
+    color:white;
+    font-family:Arial;
+    margin:30px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    font-size:18px;
+    border:none;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #555;
+    padding:12px;
+    text-align:center;
+}
+
+th{
+    background:#374151;
+}
+
+button{
+    padding:10px 20px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#2563eb;
+    color:white;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+#total{
+    margin-top:20px;
+    font-size:28px;
+    font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🛒 Продажа</h1>
+
+<input
+id="search"
+placeholder="Введите название товара..."
+onkeyup="searchProduct()">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Название</th>
+<th>Цена</th>
+<th>Остаток</th>
+<th></th>
+
+</tr>
+
+</thead>
+
+<tbody id="list">
+
+</tbody>
+
+</table>
+
+<h2 style="margin-top:40px;">🛒 Корзина</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Название</th>
+<th>Цена</th>
+
+</tr>
+
+</thead>
+
+<tbody id="cart">
+
+</tbody>
+
+</table>
+
+<div id="total">
+
+Итого: 0 грн
+
+</div>
+
+<br>
+
+<button onclick="checkout()">
+
+💵 Продать
+
+</button>
+
+<script src="sales.js"></script>
+
+</body>
+</html>

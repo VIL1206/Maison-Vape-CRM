@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Прием товара</title>
+
+<style>
+
+body{
+background:#111827;
+color:white;
+font-family:Arial;
+padding:40px;
+}
+
+select,input,button{
+
+width:100%;
+padding:12px;
+margin-bottom:15px;
+border-radius:8px;
+border:none;
+
+}
+
+button{
+
+background:#2563eb;
+color:white;
+cursor:pointer;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>📥 Прием товара</h1>
+
+<select id="product"></select>
+
+<input
+id="quantity"
+type="number"
+placeholder="Количество">
+
+<input
+id="supplier"
+placeholder="Поставщик">
+
+<button onclick="acceptDelivery()">
+
+Принять товар
+
+</button>
+
+<script src="delivery.js"></script>
+
+</body>
+
+</html>

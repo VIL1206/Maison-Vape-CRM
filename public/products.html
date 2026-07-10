@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Товары</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#1f2937;
+    color:white;
+    margin:30px;
+}
+
+h1{
+    text-align:center;
+}
+
+.form{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-bottom:20px;
+}
+
+input{
+    padding:10px;
+    border:none;
+    border-radius:8px;
+}
+
+button{
+    padding:12px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th,td{
+    border:1px solid #555;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#374151;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📦 Товары</h1>
+
+<div class="form">
+
+<input id="barcode" placeholder="Штрихкод">
+
+<input id="name" placeholder="Название">
+
+<input id="category" placeholder="Категория">
+
+<input id="buyPrice" type="number" placeholder="Закупка">
+
+<input id="sellPrice" type="number" placeholder="Продажа">
+
+<input id="quantity" type="number" placeholder="Количество">
+
+</div>
+
+<button onclick="addProduct()">Добавить товар</button>
+
+<table>
+
+<thead>
+
+<input
+    id="search"
+    placeholder="🔍 Поиск по названию или штрихкоду"
+    onkeyup="searchProducts()"
+    style="width:100%;margin-top:20px;margin-bottom:20px;padding:12px;border-radius:8px;border:none;font-size:16px;">
+
+<tr>
+<th>ID</th>
+<th>Название</th>
+<th>Категория</th>
+<th>Остаток</th>
+<th>Продажа</th>
+<th>Действия</th>
+</tr>
+
+</thead>
+
+<tbody id="products">
+
+</tbody>
+
+</table>
+
+<script src="products.js"></script>
+
+</body>
+</html>

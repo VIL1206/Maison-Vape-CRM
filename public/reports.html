@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+
+<title>Отчеты</title>
+
+<style>
+
+body{
+
+background:#111827;
+
+color:white;
+
+font-family:Arial;
+
+padding:30px;
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+th,td{
+
+border:1px solid #555;
+
+padding:10px;
+
+text-align:center;
+
+}
+
+th{
+
+background:#374151;
+
+}
+
+.card{
+
+background:#1f2937;
+
+padding:20px;
+
+margin-bottom:20px;
+
+border-radius:10px;
+
+font-size:22px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>📊 Отчет</h1>
+
+<div class="card">
+
+💰 Общая выручка:
+
+<span id="sum">0</span>
+
+грн
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Дата</th>
+
+<th>Товар</th>
+
+<th>Цена</th>
+
+<th>Оплата</th>
+
+</tr>
+
+</thead>
+
+<tbody id="sales">
+
+</tbody>
+
+</table>
+
+<script src="reports.js"></script>
+
+</body>
+
+</html>

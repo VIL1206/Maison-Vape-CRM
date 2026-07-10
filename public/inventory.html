@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Переучет товара</title>
+
+<style>
+
+body{
+    background:#111827;
+    color:white;
+    font-family:Arial;
+    padding:40px;
+}
+
+select,input,button{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border:none;
+    border-radius:8px;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+}
+
+#current{
+    margin-bottom:20px;
+    font-size:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>📋 Переучет товара</h1>
+
+<select id="product" onchange="showQuantity()"></select>
+
+<div id="current">
+Остаток в базе: 0
+</div>
+
+<input
+id="newQuantity"
+type="number"
+placeholder="Фактическое количество">
+
+<button onclick="saveInventory()">
+
+Сохранить переучет
+
+</button>
+
+<script src="inventory.js"></script>
+
+</body>
+</html>
