@@ -32,8 +32,19 @@ app.get("/api/products", async (req, res) => {
     try {
 
         const result = await db.query(
-            "SELECT * FROM products"
-        );
+`
+SELECT
+id,
+barcode,
+name,
+category,
+buyPrice AS "buyPrice",
+sellPrice AS "sellPrice",
+quantity
+
+FROM products
+`
+);
 
         res.json(result.rows);
 
