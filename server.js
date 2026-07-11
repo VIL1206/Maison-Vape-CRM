@@ -220,7 +220,6 @@ success:false
    ПРОДАЖИ
 ============================ */
 
-
 app.post("/api/sale", async(req,res)=>{
 
 try{
@@ -247,6 +246,7 @@ const check = await db.query(
 );
 
 
+
 if(check.rows.length===0){
 
 return res.status(404).json({
@@ -257,14 +257,19 @@ message:"Товар не найден"
 }
 
 
-if(check.rows[0].quantity<=0){
+
+const dbProduct = check.rows[0];
+
+
+if(Number(dbProduct.quantity)<=0){
 
 return res.status(400).json({
 success:false,
-message:`${product.name} закончился`
+message:`${dbProduct.name} закончился`
 });
 
 }
+
 
 
 
@@ -272,20 +277,20 @@ await db.query(
 `
 INSERT INTO sales
 (
-product_id,
-product_name,
+productid,
+productname,
 quantity,
 price,
 payment,
-created_at
+date
 )
 VALUES($1,$2,$3,$4,$5,NOW())
 `,
 [
-product.id,
-product.productName || product.name,
+dbProduct.id,
+dbProduct.name,
 1,
-product.sellPrice,
+Number(dbProduct.sellprice),
 payment
 ]
 );
@@ -309,27 +314,25 @@ product.id
 
 
 res.json({
-success:true
+success:true,
+message:"Продажа проведена"
 });
+
 
 
 }catch(err){
 
-console.error(err);
+console.error("SALE ERROR:",err);
 
 res.status(500).json({
-success:false
+success:false,
+message:err.message
 });
 
 }
 
 
 });
-
-
-
-
-
 // Получить кассу
 
 app.get("/api/cash", async(req,res)=>{
