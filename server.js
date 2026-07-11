@@ -313,16 +313,18 @@ success:true
 });
 
 
-catch(err){
+}catch(err){
 
-console.error("SALE ERROR:", err);
+console.error(err);
 
 res.status(500).json({
-success:false,
-message:err.message
+success:false
 });
 
 }
+
+
+});
 
 
 
