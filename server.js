@@ -272,12 +272,13 @@ await db.query(
 `
 INSERT INTO sales
 (
-productId,
-productName,
-quantity,
-price,
-payment,
-date
+[
+product.id,
+product.productName || product.name,
+1,
+product.sellPrice,
+payment
+]
 )
 VALUES($1,$2,$3,$4,$5,NOW())
 `,
