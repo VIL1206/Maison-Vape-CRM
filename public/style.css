@@ -464,8 +464,6 @@ font-size:26px;
     color: white;
 }
 
-box-sizing: border-box;
-
 input,
 button{
     box-sizing:border-box;
