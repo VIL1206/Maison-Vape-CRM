@@ -393,6 +393,23 @@ app.post("/api/close-shift", (req, res) => {
     );
 
 });
+
+app.get("/api/history", (req,res)=>{
+
+    db.all(
+        "SELECT * FROM shift_reports ORDER BY id DESC",
+        [],
+        (err,rows)=>{
+
+            if(err){
+                return res.status(500).json(err);
+            }
+
+            res.json(rows);
+
+        });
+
+});
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`CRM запущена на порту ${PORT}`);
 });
