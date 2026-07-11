@@ -29,4 +29,20 @@ async function loadCash(){
 
 }
 
+async function closeShift(){
+
+    if(!confirm("Закрыть смену и обнулить кассу?")){
+        return;
+    }
+
+    await fetch("/api/close-shift",{
+        method:"POST"
+    });
+
+    alert("Смена закрыта");
+
+    loadCash();
+
+}
+
 loadCash();

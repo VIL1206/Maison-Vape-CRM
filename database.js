@@ -23,6 +23,16 @@ db.serialize(() => {
     `);
 });
 db.run(`
+CREATE TABLE IF NOT EXISTS shift_reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cash REAL,
+    card REAL,
+    telegram REAL,
+    total REAL,
+    closedAt TEXT
+)
+`);
+db.run(`
 CREATE TABLE IF NOT EXISTS deliveries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     productId INTEGER,

@@ -201,9 +201,16 @@ app.post("/api/sale", async (req, res) => {
 // Получить кассу
 app.get("/api/cash", (req, res) => {
 
+    const today = new Date().toISOString().split("T")[0];
+
     db.all(
-        "SELECT payment, SUM(price) as total FROM sales GROUP BY payment",
-        [],
+        `
+        SELECT payment, SUM(price) as total
+        FROM sales
+        WHERE date LIKE ?
+        GROUP BY payment
+        `,
+        [`${today}%`],
         (err, rows) => {
 
             if (err) {
@@ -327,7 +334,65 @@ app.get("/api/report", (req, res) => {
         });
 
 });
+app.post("/api/close-shift", (req, res) => {
 
+    db.all(
+        "SELECT payment, SUM(price) as total FROM sales GROUP BY payment",
+        [],
+        (err, rows) => {
+
+            if (err) {
+                return res.status(500).json(err);
+            }
+
+            let cash = 0;
+            let card = 0;
+            let telegram = 0;
+
+            rows.forEach(item => {
+                if (item.payment === "Наличные") cash = item.total || 0;
+                if (item.payment === "Карта") card = item.total || 0;
+                if (item.payment === "Telegram") telegram = item.total || 0;
+            });
+
+            const total = Number(cash) + Number(card) + Number(telegram);
+
+            db.run(
+                `INSERT INTO shift_reports
+                (cash, card, telegram, total, closedAt)
+                VALUES (?, ?, ?, ?, ?)`,
+                [
+                    cash,
+                    card,
+                    telegram,
+                    total,
+                    new Date().toISOString()
+                ],
+                function(err){
+
+                    if(err){
+                        return res.status(500).json(err);
+                    }
+
+                    db.run("DELETE FROM sales", [], function(err){
+
+                        if(err){
+                            return res.status(500).json(err);
+                        }
+
+                        res.json({
+                            success:true
+                        });
+
+                    });
+
+                }
+            );
+
+        }
+    );
+
+});
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`CRM запущена на порту ${PORT}`);
 });
