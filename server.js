@@ -201,19 +201,13 @@ app.post("/api/sale", async (req, res) => {
 // Получить кассу
 app.get("/api/cash", (req, res) => {
 
-    const today = new Date().toISOString().split("T")[0];
-
     db.all(
-        `
-        SELECT payment, SUM(price) as total
-        FROM sales
-        WHERE date LIKE ?
-        GROUP BY payment
-        `,
-        [`${today}%`],
+        "SELECT payment, SUM(price) as total FROM sales GROUP BY payment",
+        [],
         (err, rows) => {
 
             if (err) {
+                console.log(err);
                 return res.status(500).json(err);
             }
 
