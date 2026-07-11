@@ -242,7 +242,7 @@ for(const product of cart){
 
 
 const check = await db.query(
-"SELECT quantity FROM products WHERE id=$1",
+"SELECT * FROM products WHERE id=$1",
 [product.id]
 );
 
@@ -313,18 +313,16 @@ success:true
 });
 
 
-}catch(err){
+catch(err){
 
-console.error(err);
+console.error("SALE ERROR:", err);
 
 res.status(500).json({
-success:false
+success:false,
+message:err.message
 });
 
 }
-
-
-});
 
 
 
