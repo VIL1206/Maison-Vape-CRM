@@ -21,698 +21,743 @@ app.get("/api/test", (req, res) => {
     });
 });
 
+
 /* ============================
    ТОВАРЫ
 ============================ */
 
-// Получить все товары
-app.get("/api/products", (req, res) => {
 
-    db.all(
-        "SELECT * FROM products ORDER BY id DESC",
-        [],
-        (err, rows) => {
+app.get("/api/products", async (req, res) => {
 
-            if (err) {
-                console.error(err);
-                return res.status(500).json({
-                    success: false,
-                    message: "Ошибка получения товаров"
-                });
-            }
+    try {
 
-            res.json(rows);
+        const result = await db.query(
+            "SELECT * FROM products ORDER BY id DESC"
+        );
 
-        }
-    );
+        res.json(result.rows);
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            success:false
+        });
+
+    }
 
 });
 
-// Добавить товар
-app.post("/api/products", (req, res) => {
 
-    let {
-        barcode,
-        name,
-        category,
-        buyPrice,
-        sellPrice,
-        quantity
-    } = req.body;
 
-    if (!name || !name.trim()) {
-        return res.status(400).json({
-            success: false,
-            message: "Введите название товара"
-        });
-    }
+app.post("/api/products", async (req,res)=>{
 
-    barcode = barcode || "";
-    category = category || "";
-    buyPrice = Number(buyPrice) || 0;
-    sellPrice = Number(sellPrice) || 0;
-    quantity = Number(quantity) || 0;
+    try {
 
-    db.run(
-        `
-        INSERT INTO products
-        (
+        let {
             barcode,
             name,
             category,
             buyPrice,
             sellPrice,
             quantity
-        )
-        VALUES(?,?,?,?,?,?)
-        `,
-        [
-            barcode,
-            name.trim(),
-            category,
-            buyPrice,
-            sellPrice,
-            quantity
-        ],
-        function (err) {
+        } = req.body;
 
-            if (err) {
 
-                console.error(err);
+        if(!name || !name.trim()){
 
-                return res.status(500).json({
-                    success: false,
-                    message: "Ошибка добавления товара"
-                });
-
-            }
-
-            res.json({
-                success: true,
-                id: this.lastID
+            return res.status(400).json({
+                success:false,
+                message:"Введите название товара"
             });
 
         }
-    );
 
+
+        const result = await db.query(
+`
+INSERT INTO products
+(
+barcode,
+name,
+category,
+buyPrice,
+sellPrice,
+quantity
+)
+VALUES($1,$2,$3,$4,$5,$6)
+RETURNING id
+`,
+[
+barcode || "",
+name.trim(),
+category || "",
+Number(buyPrice)||0,
+Number(sellPrice)||0,
+Number(quantity)||0
+]
+);
+
+
+res.json({
+    success:true,
+    id:result.rows[0].id
 });
 
-// Удалить товар
-app.delete("/api/products/:id", (req, res) => {
 
-    db.run(
-        "DELETE FROM products WHERE id=?",
-        [req.params.id],
-        function (err) {
+    } catch(err){
 
-            if (err) {
+        console.error(err);
 
-                console.error(err);
-
-                return res.status(500).json({
-                    success: false
-                });
-
-            }
-
-            res.json({
-                success: true
-            });
-
-        }
-    );
-
-});
-
-// Изменить товар
-app.put("/api/products/:id", (req, res) => {
-
-    let {
-        barcode,
-        name,
-        category,
-        buyPrice,
-        sellPrice,
-        quantity
-    } = req.body;
-
-    if (!name || !name.trim()) {
-
-        return res.status(400).json({
-            success: false,
-            message: "Название обязательно"
+        res.status(500).json({
+            success:false
         });
 
     }
 
-    db.run(
-        `
-        UPDATE products
-        SET
-            barcode=?,
-            name=?,
-            category=?,
-            buyPrice=?,
-            sellPrice=?,
-            quantity=?
-        WHERE id=?
-        `,
-        [
-            barcode,
-            name.trim(),
-            category,
-            Number(buyPrice),
-            Number(sellPrice),
-            Number(quantity),
-            req.params.id
-        ],
-        function (err) {
-
-            if (err) {
-
-                console.error(err);
-
-                return res.status(500).json({
-                    success: false
-                });
-
-            }
-
-            res.json({
-                success: true
-            });
-
-        }
-    );
 
 });
 
+
+
+app.delete("/api/products/:id", async(req,res)=>{
+
+try{
+
+await db.query(
+"DELETE FROM products WHERE id=$1",
+[req.params.id]
+);
+
+
+res.json({
+success:true
+});
+
+
+}catch(err){
+
+console.error(err);
+
+res.status(500).json({
+success:false
+});
+
+}
+
+});
+
+
+
+app.put("/api/products/:id", async(req,res)=>{
+
+try{
+
+const {
+barcode,
+name,
+category,
+buyPrice,
+sellPrice,
+quantity
+}=req.body;
+
+
+await db.query(
+`
+UPDATE products SET
+
+barcode=$1,
+name=$2,
+category=$3,
+buyPrice=$4,
+sellPrice=$5,
+quantity=$6
+
+WHERE id=$7
+`,
+[
+barcode,
+name,
+category,
+Number(buyPrice),
+Number(sellPrice),
+Number(quantity),
+req.params.id
+]
+);
+
+
+res.json({
+success:true
+});
+
+
+}catch(err){
+
+console.error(err);
+
+res.status(500).json({
+success:false
+});
+
+}
+
+});
 /* ============================
    ПРОДАЖИ
 ============================ */
-// Продажа товаров
-app.post("/api/sale", (req, res) => {
 
-    const { cart, payment } = req.body;
 
-    if (!Array.isArray(cart) || cart.length === 0) {
-        return res.status(400).json({
-            success: false,
-            message: "Корзина пустая"
-        });
-    }
+app.post("/api/sale", async(req,res)=>{
 
-    const now = new Date().toLocaleString("ru-RU");
+try{
 
-    let completed = 0;
-    let hasError = false;
+const {cart,payment}=req.body;
 
-    cart.forEach(product => {
 
-        db.get(
-            "SELECT quantity FROM products WHERE id=?",
-            [product.id],
-            (err, row) => {
+if(!Array.isArray(cart) || cart.length===0){
 
-                if (hasError) return;
+return res.status(400).json({
+success:false,
+message:"Корзина пустая"
+});
 
-                if (err || !row) {
+}
 
-                    hasError = true;
 
-                    return res.status(500).json({
-                        success: false,
-                        message: "Товар не найден"
-                    });
+for(const product of cart){
 
-                }
 
-                if (row.quantity <= 0) {
+const check = await db.query(
+"SELECT quantity FROM products WHERE id=$1",
+[product.id]
+);
 
-                    hasError = true;
 
-                    return res.status(400).json({
-                        success: false,
-                        message: `${product.name} закончился`
-                    });
+if(check.rows.length===0){
 
-                }
+return res.status(404).json({
+success:false,
+message:"Товар не найден"
+});
 
-                db.run(
-                    `INSERT INTO sales
-                    (productId, productName, quantity, price, payment, date)
-                    VALUES (?,?,?,?,?,?)`,
-                    [
-                        product.id,
-                        product.name,
-                        1,
-                        product.sellPrice,
-                        payment,
-                        now
-                    ],
-                    function (err) {
+}
 
-                        if (err && !hasError) {
 
-                            hasError = true;
+if(check.rows[0].quantity<=0){
 
-                            return res.status(500).json({
-                                success: false
-                            });
+return res.status(400).json({
+success:false,
+message:`${product.name} закончился`
+});
 
-                        }
+}
 
-                        db.run(
-                            `UPDATE products
-                             SET quantity = quantity - 1
-                             WHERE id=?`,
-                            [product.id],
-                            function (err) {
 
-                                if (err && !hasError) {
 
-                                    hasError = true;
+await db.query(
+`
+INSERT INTO sales
+(
+productId,
+productName,
+quantity,
+price,
+payment,
+date
+)
+VALUES($1,$2,$3,$4,$5,NOW())
+`,
+[
+product.id,
+product.name,
+1,
+product.sellPrice,
+payment
+]
+);
 
-                                    return res.status(500).json({
-                                        success: false
-                                    });
 
-                                }
 
-                                completed++;
+await db.query(
+`
+UPDATE products
+SET quantity = quantity - 1
+WHERE id=$1
+`,
+[
+product.id
+]
+);
 
-                                if (completed === cart.length && !hasError) {
 
-                                    res.json({
-                                        success: true
-                                    });
 
-                                }
+}
 
-                            }
-                        );
 
-                    }
-                );
+res.json({
+success:true
+});
 
-            }
-        );
 
-    });
+}catch(err){
+
+console.error(err);
+
+res.status(500).json({
+success:false
+});
+
+}
+
 
 });
+
+
+
 
 
 // Получить кассу
-app.get("/api/cash", (req, res) => {
 
-    db.all(
-        `
-        SELECT payment,
-               SUM(price) AS total
-        FROM sales
-        GROUP BY payment
-        `,
-        [],
-        (err, rows) => {
+app.get("/api/cash", async(req,res)=>{
 
-            if (err) {
 
-                console.error(err);
+try{
 
-                return res.status(500).json({
-                    success: false
-                });
 
-            }
+const result = await db.query(
+`
+SELECT 
+payment,
+SUM(price) AS total
 
-            res.json(rows);
+FROM sales
 
-        }
+GROUP BY payment
+`
+);
 
-    );
+
+res.json(result.rows);
+
+
+
+}catch(err){
+
+console.error(err);
+
+res.status(500).json({
+success:false
+});
+
+}
+
 
 });
 
 
-// Прием товара
-app.post("/api/delivery", (req, res) => {
 
-    const {
-        productId,
-        quantity,
-        supplier
-    } = req.body;
 
-    const now = new Date().toLocaleString("ru-RU");
 
-    db.get(
-        "SELECT * FROM products WHERE id=?",
-        [productId],
-        (err, product) => {
+// Отчет продаж
 
-            if (err || !product) {
+app.get("/api/report", async(req,res)=>{
 
-                return res.status(404).json({
-                    success: false,
-                    message: "Товар не найден"
-                });
 
-            }
+try{
 
-            db.run(
-                `
-                UPDATE products
-                SET quantity = quantity + ?
-                WHERE id=?
-                `,
-                [
-                    Number(quantity),
-                    productId
-                ],
-                function (err) {
 
-                    if (err) {
+const result = await db.query(
+`
+SELECT *
 
-                        return res.status(500).json({
-                            success: false
-                        });
+FROM sales
 
-                    }
+ORDER BY id DESC
+`
+);
 
-                    db.run(
-                        `
-                        INSERT INTO deliveries
-                        (
-                            productId,
-                            productName,
-                            quantity,
-                            supplier,
-                            date
-                        )
-                        VALUES (?,?,?,?,?)
-                        `,
-                        [
-                            productId,
-                            product.name,
-                            Number(quantity),
-                            supplier,
-                            now
-                        ],
-                        function (err) {
 
-                            if (err) {
+res.json(result.rows);
 
-                                return res.status(500).json({
-                                    success: false
-                                });
 
-                            }
 
-                            res.json({
-                                success: true
-                            });
+}catch(err){
 
-                        }
+console.error(err);
 
-                    );
+res.status(500).json({
+success:false
+});
 
-                }
+}
 
-            );
-
-        }
-
-    );
 
 });
+/* ============================
+   ПРИЕМ ТОВАРА
+============================ */
+
+
+app.post("/api/delivery", async(req,res)=>{
+
+try{
+
+
+const {
+productId,
+quantity,
+supplier
+}=req.body;
+
+
+
+const product = await db.query(
+"SELECT * FROM products WHERE id=$1",
+[productId]
+);
+
+
+
+if(product.rows.length===0){
+
+return res.status(404).json({
+success:false,
+message:"Товар не найден"
+});
+
+}
+
+
+
+await db.query(
+`
+UPDATE products
+
+SET quantity = quantity + $1
+
+WHERE id=$2
+`,
+[
+Number(quantity),
+productId
+]
+);
+
+
+
+await db.query(
+`
+INSERT INTO deliveries
+(
+productId,
+productName,
+quantity,
+supplier,
+date
+)
+
+VALUES($1,$2,$3,$4,NOW())
+`,
+[
+productId,
+product.rows[0].name,
+Number(quantity),
+supplier
+]
+);
+
+
+
+res.json({
+success:true
+});
+
+
+
+}catch(err){
+
+console.error(err);
+
+res.status(500).json({
+success:false
+});
+
+}
+
+});
+
+
+
+
 
 /* ============================
    ПЕРЕУЧЕТ
 ============================ */
-// Переучет товара
-app.post("/api/inventory", (req, res) => {
 
-    const { productId, newQuantity } = req.body;
 
-    db.get(
-        "SELECT * FROM products WHERE id=?",
-        [productId],
-        (err, product) => {
+app.post("/api/inventory", async(req,res)=>{
 
-            if (err || !product) {
 
-                return res.status(404).json({
-                    success: false,
-                    message: "Товар не найден"
-                });
+try{
 
-            }
 
-            const difference =
-                Number(newQuantity) - Number(product.quantity);
+const {
+productId,
+newQuantity
+}=req.body;
 
-            const now = new Date().toLocaleString("ru-RU");
 
-            db.run(
-                `
-                UPDATE products
-                SET quantity=?
-                WHERE id=?
-                `,
-                [
-                    Number(newQuantity),
-                    productId
-                ],
-                function (err) {
 
-                    if (err) {
+const product = await db.query(
+"SELECT * FROM products WHERE id=$1",
+[productId]
+);
 
-                        return res.status(500).json({
-                            success: false
-                        });
 
-                    }
 
-                    db.run(
-                        `
-                        INSERT INTO inventory
-                        (
-                            productId,
-                            productName,
-                            oldQuantity,
-                            newQuantity,
-                            difference,
-                            date
-                        )
-                        VALUES (?,?,?,?,?,?)
-                        `,
-                        [
-                            productId,
-                            product.name,
-                            product.quantity,
-                            Number(newQuantity),
-                            difference,
-                            now
-                        ],
-                        function (err) {
+if(product.rows.length===0){
 
-                            if (err) {
+return res.status(404).json({
+success:false
+});
 
-                                return res.status(500).json({
-                                    success: false
-                                });
+}
 
-                            }
 
-                            res.json({
-                                success: true
-                            });
 
-                        }
+const oldQuantity = product.rows[0].quantity;
 
-                    );
+const difference =
+Number(newQuantity)-Number(oldQuantity);
 
-                }
 
-            );
 
-        }
+await db.query(
+`
+UPDATE products
 
-    );
+SET quantity=$1
+
+WHERE id=$2
+`,
+[
+Number(newQuantity),
+productId
+]
+);
+
+
+
+await db.query(
+`
+INSERT INTO inventory
+(
+productId,
+productName,
+oldQuantity,
+newQuantity,
+difference,
+date
+)
+
+VALUES($1,$2,$3,$4,$5,NOW())
+`,
+[
+productId,
+product.rows[0].name,
+oldQuantity,
+Number(newQuantity),
+difference
+]
+);
+
+
+
+res.json({
+success:true
+});
+
+
+
+}catch(err){
+
+console.error(err);
+
+res.status(500).json({
+success:false
+});
+
+}
+
 
 });
 
 
-// Отчет по продажам
-app.get("/api/report", (req, res) => {
 
-    db.all(
-        `
-        SELECT *
-        FROM sales
-        ORDER BY id DESC
-        `,
-        [],
-        (err, rows) => {
 
-            if (err) {
 
-                console.error(err);
+/* ============================
+   ЗАКРЫТИЕ СМЕНЫ
+============================ */
 
-                return res.status(500).json({
-                    success: false
-                });
 
-            }
+app.post("/api/close-shift", async(req,res)=>{
 
-            res.json(rows);
 
-        }
+try{
 
-    );
+
+const result = await db.query(
+`
+SELECT
+payment,
+SUM(price) AS total
+
+FROM sales
+
+GROUP BY payment
+`
+);
+
+
+
+let cash=0;
+let card=0;
+let telegram=0;
+
+
+
+result.rows.forEach(item=>{
+
+
+if(item.payment==="Наличные")
+cash=Number(item.total);
+
+
+if(item.payment==="Карта")
+card=Number(item.total);
+
+
+if(item.payment==="Telegram")
+telegram=Number(item.total);
+
 
 });
 
 
-// Закрытие смены
-app.post("/api/close-shift", (req, res) => {
 
-    db.all(
-        `
-        SELECT payment,
-               SUM(price) AS total
-        FROM sales
-        GROUP BY payment
-        `,
-        [],
-        (err, rows) => {
+const total =
+cash+
+card+
+telegram;
 
-            if (err) {
 
-                return res.status(500).json({
-                    success: false
-                });
 
-            }
+await db.query(
+`
+INSERT INTO shift_reports
+(
+cash,
+card,
+telegram,
+total,
+closedAt
+)
 
-            let cash = 0;
-            let card = 0;
-            let telegram = 0;
+VALUES($1,$2,$3,$4,NOW())
+`,
+[
+cash,
+card,
+telegram,
+total
+]
+);
 
-            rows.forEach(item => {
 
-                if (item.payment === "Наличные")
-                    cash = item.total || 0;
 
-                if (item.payment === "Карта")
-                    card = item.total || 0;
+await db.query(
+"DELETE FROM sales"
+);
 
-                if (item.payment === "Telegram")
-                    telegram = item.total || 0;
 
-            });
 
-            const total =
-                Number(cash) +
-                Number(card) +
-                Number(telegram);
+res.json({
+success:true
+});
 
-            db.run(
-                `
-                INSERT INTO shift_reports
-                (
-                    cash,
-                    card,
-                    telegram,
-                    total,
-                    closedAt
-                )
-                VALUES (?,?,?,?,?)
-                `,
-                [
-                    cash,
-                    card,
-                    telegram,
-                    total,
-                    new Date().toLocaleString("ru-RU")
-                ],
-                function (err) {
 
-                    if (err) {
 
-                        return res.status(500).json({
-                            success: false
-                        });
+}catch(err){
 
-                    }
+console.error(err);
 
-                    db.run(
-                        "DELETE FROM sales",
-                        [],
-                        function (err) {
+res.status(500).json({
+success:false
+});
 
-                            if (err) {
-
-                                return res.status(500).json({
-                                    success: false
-                                });
-
-                            }
-
-                            res.json({
-                                success: true
-                            });
-
-                        }
-                    );
-
-                }
-
-            );
-
-        }
-
-    );
+}
 
 });
 
 
-// История смен
-app.get("/api/history", (req, res) => {
 
-    db.all(
-        `
-        SELECT *
-        FROM shift_reports
-        ORDER BY id DESC
-        `,
-        [],
-        (err, rows) => {
 
-            if (err) {
 
-                return res.status(500).json({
-                    success: false
-                });
+/* ============================
+   ИСТОРИЯ СМЕН
+============================ */
 
-            }
 
-            res.json(rows);
+app.get("/api/history", async(req,res)=>{
 
-        }
 
-    );
+try{
+
+
+const result = await db.query(
+`
+SELECT *
+
+FROM shift_reports
+
+ORDER BY id DESC
+`
+);
+
+
+res.json(result.rows);
+
+
+
+}catch(err){
+
+console.error(err);
+
+res.status(500).json({
+success:false
+});
+
+}
 
 });
+
+
+
 
 
 // Запуск сервера
-app.listen(PORT, "0.0.0.0", () => {
 
-    console.log("==================================");
-    console.log("✅ Maison Vape CRM запущена");
-    console.log(`🌐 http://localhost:${PORT}`);
-    console.log("==================================");
+app.listen(PORT,"0.0.0.0",()=>{
+
+
+console.log("==============================");
+console.log("✅ Maison Vape CRM запущена");
+console.log(`🌐 http://localhost:${PORT}`);
+console.log("==============================");
+
 
 });

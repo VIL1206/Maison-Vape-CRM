@@ -10,11 +10,13 @@
   "author": "",
   "license": "ISC",
   "engines": {
-  "node": "22.x"
-},
+    "node": "22.x"
+  },
   "type": "commonjs",
   "dependencies": {
+    "dotenv": "^17.4.2",
     "express": "^4.21.2",
+    "pg": "^8.22.0",
     "sqlite3": "^5.1.7"
   },
   "allowScripts": {

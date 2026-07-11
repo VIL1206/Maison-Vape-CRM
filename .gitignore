@@ -1,3 +1,6 @@
 node_modules/
 maison.db
 .env
+
+.env
+node_modules
