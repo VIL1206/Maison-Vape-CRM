@@ -4,7 +4,7 @@ const db = require("./database");
 
 const app = express();
 app.use(express.json());
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Разрешаем отдавать файлы из папки public
 app.use(express.static(path.join(__dirname, "public")));
@@ -328,6 +328,6 @@ app.get("/api/report", (req, res) => {
 
 });
 
-app.listen(3000, "0.0.0.0", () => {
-    console.log("CRM запущена");
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`CRM запущена на порту ${PORT}`);
 });
