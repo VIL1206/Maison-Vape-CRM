@@ -32,7 +32,7 @@ app.get("/api/products", async (req, res) => {
     try {
 
         const result = await db.query(
-            "SELECT * FROM products ORDER BY id DESC"
+            "SELECT * FROM products"
         );
 
         res.json(result.rows);
