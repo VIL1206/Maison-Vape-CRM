@@ -2,106 +2,77 @@
 <html lang="ru">
 
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Отчеты</title>
+    <title>Отчеты</title>
 
-<style>
+    <style>
+        body {
+            background: #111827;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
 
-body{
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
 
-background:#111827;
+        .card {
+            background: #1f2937;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            font-size: 22px;
+        }
 
-color:white;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-font-family:Arial;
+        th,
+        td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: center;
+        }
 
-padding:30px;
-
-}
-
-table{
-
-width:100%;
-
-border-collapse:collapse;
-
-}
-
-th,td{
-
-border:1px solid #555;
-
-padding:10px;
-
-text-align:center;
-
-}
-
-th{
-
-background:#374151;
-
-}
-
-.card{
-
-background:#1f2937;
-
-padding:20px;
-
-margin-bottom:20px;
-
-border-radius:10px;
-
-font-size:22px;
-
-}
-
-</style>
-
+        th {
+            background: #374151;
+        }
+    </style>
 </head>
 
 <body>
 
-<h1>📊 Отчет</h1>
+    <h1>📊 Отчет</h1>
 
-<div class="card">
+    <div class="card">
+        💰 Общая выручка:
+        <span id="sum">0</span> грн
+    </div>
 
-💰 Общая выручка:
+    <table>
 
-<span id="sum">0</span>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Товар</th>
+                <th>Цена</th>
+                <th>Оплата</th>
+            </tr>
+        </thead>
 
-грн
+        <tbody id="sales">
 
-</div>
+        </tbody>
 
-<table>
+    </table>
 
-<thead>
-
-<tr>
-
-<th>Дата</th>
-
-<th>Товар</th>
-
-<th>Цена</th>
-
-<th>Оплата</th>
-
-</tr>
-
-</thead>
-
-<tbody id="sales">
-
-</tbody>
-
-</table>
-
-<script src="reports.js"></script>
+    <script src="reports.js"></script>
 
 </body>
 

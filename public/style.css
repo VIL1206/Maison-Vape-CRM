@@ -459,3 +459,14 @@ font-size:26px;
 }
 
 }
+.menu a.active {
+    background: #2563eb;
+    color: white;
+}
+
+box-sizing: border-box;
+
+input,
+button{
+    box-sizing:border-box;
+}

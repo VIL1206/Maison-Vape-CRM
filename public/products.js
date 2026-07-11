@@ -1,80 +1,98 @@
 async function loadProducts() {
+    try {
+        const response = await fetch("/api/products");
 
-    const response = await fetch("/api/products");
-    const products = await response.json();
+        if (!response.ok) {
+            throw new Error("Ошибка загрузки товаров");
+        }
 
-    let html = "";
+        const products = await response.json();
 
-    products.forEach(product => {
+        let html = "";
 
-        html += `
-        <tr>
-            <td>${product.id}</td>
-            <td>${product.name}</td>
-            <td>${product.category}</td>
-            <td>${product.quantity}</td>
-            <td>${product.sellPrice} грн</td>
-            <td>
+        products.forEach(product => {
+            html += `
+                <tr>
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>${product.quantity}</td>
+                    <td>${product.sellPrice} грн</td>
+                    <td>
+                        <button onclick="editProduct(${product.id})">✏</button>
+                        <button onclick="deleteProduct(${product.id})">🗑</button>
+                    </td>
+                </tr>
+            `;
+        });
 
-<button onclick="editProduct(${product.id})">
-✏
-</button>
+        document.getElementById("products").innerHTML = html;
 
-<button onclick="deleteProduct(${product.id})">
-🗑
-</button>
-
-</td>
-        </tr>
-        `;
-
-    });
-
-    document.getElementById("products").innerHTML = html;
-
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось загрузить товары.");
+    }
 }
 
 async function addProduct() {
 
     const product = {
-
-        barcode: document.getElementById("barcode").value,
-        name: document.getElementById("name").value,
-        category: document.getElementById("category").value,
+        barcode: document.getElementById("barcode").value.trim(),
+        name: document.getElementById("name").value.trim(),
+        category: document.getElementById("category").value.trim(),
         buyPrice: Number(document.getElementById("buyPrice").value),
         sellPrice: Number(document.getElementById("sellPrice").value),
         quantity: Number(document.getElementById("quantity").value)
-
     };
 
-    await fetch("/api/products", {
+    if (!product.name) {
+        alert("Введите название товара.");
+        return;
+    }
 
-        method: "POST",
+    try {
+        const response = await fetch("/api/products", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(product)
+        });
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+        if (!response.ok) {
+            throw new Error("Ошибка добавления товара");
+        }
 
-        body: JSON.stringify(product)
+        clearForm();
+        await loadProducts();
 
-    });
-
-    clearForm();
-
-    loadProducts();
-
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось добавить товар.");
+    }
 }
 
 async function deleteProduct(id) {
 
-    if (!confirm("Удалить товар?")) return;
+    if (!confirm("Удалить товар?")) {
+        return;
+    }
 
-    await fetch("/api/products/" + id, {
-        method: "DELETE"
-    });
+    try {
+        const response = await fetch(`/api/products/${id}`, {
+            method: "DELETE"
+        });
 
-    loadProducts();
+        if (!response.ok) {
+            throw new Error("Ошибка удаления товара");
+        }
 
+        await loadProducts();
+
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось удалить товар.");
+    }
 }
 
 function searchProducts() {
@@ -87,71 +105,77 @@ function searchProducts() {
     const rows = document.querySelectorAll("#products tr");
 
     rows.forEach(row => {
-
-        row.style.display =
-            row.innerText.toLowerCase().includes(text)
-                ? ""
-                : "none";
-
+        row.style.display = row.innerText.toLowerCase().includes(text)
+            ? ""
+            : "none";
     });
-
 }
 
-function clearForm(){
+function clearForm() {
 
-    barcode.value="";
-    name.value="";
-    category.value="";
-    buyPrice.value="";
-    sellPrice.value="";
-    quantity.value="";
-
+    document.getElementById("barcode").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("category").value = "";
+    document.getElementById("buyPrice").value = "";
+    document.getElementById("sellPrice").value = "";
+    document.getElementById("quantity").value = "";
 }
-async function editProduct(id){
 
-    const response = await fetch("/api/products");
+async function editProduct(id) {
 
-    const products = await response.json();
+    try {
+        const response = await fetch("/api/products");
 
-    const product = products.find(p=>p.id==id);
+        if (!response.ok) {
+            throw new Error("Ошибка загрузки товаров");
+        }
 
-    const name = prompt("Название",product.name);
+        const products = await response.json();
 
-    if(name===null) return;
+        const product = products.find(p => p.id === id);
 
-    const buyPrice = prompt("Закупка",product.buyPrice);
+        if (!product) {
+            alert("Товар не найден.");
+            return;
+        }
 
-    const sellPrice = prompt("Продажа",product.sellPrice);
+        const name = prompt("Название", product.name);
+        if (name === null) return;
 
-    const quantity = prompt("Количество",product.quantity);
+        const buyPrice = prompt("Закупка", product.buyPrice);
+        if (buyPrice === null) return;
 
-    await fetch("/api/products/"+id,{
+        const sellPrice = prompt("Продажа", product.sellPrice);
+        if (sellPrice === null) return;
 
-        method:"PUT",
+        const quantity = prompt("Количество", product.quantity);
+        if (quantity === null) return;
 
-        headers:{
-            "Content-Type":"application/json"
-        },
+        const updateResponse = await fetch(`/api/products/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                barcode: product.barcode,
+                name: name.trim(),
+                category: product.category,
+                buyPrice: Number(buyPrice),
+                sellPrice: Number(sellPrice),
+                quantity: Number(quantity)
+            })
+        });
 
-        body:JSON.stringify({
+        if (!updateResponse.ok) {
+            throw new Error("Ошибка обновления товара");
+        }
 
-            barcode:product.barcode,
+        await loadProducts();
 
-            name,
-
-            category:product.category,
-
-            buyPrice,
-
-            sellPrice,
-
-            quantity
-
-        })
-
-    });
-
-    loadProducts();
-
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось обновить товар.");
+    }
 }
+
 loadProducts();

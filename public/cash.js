@@ -1,48 +1,64 @@
-async function loadCash(){
+async function loadCash() {
+    try {
+        const response = await fetch("/api/cash");
 
-    const response = await fetch("/api/cash");
+        if (!response.ok) {
+            throw new Error("Ошибка загрузки кассы");
+        }
 
-    const data = await response.json();
+        const data = await response.json();
 
-    let cash = 0;
-    let card = 0;
-    let tg = 0;
+        let cash = 0;
+        let card = 0;
+        let tg = 0;
 
-    data.forEach(item=>{
+        data.forEach(item => {
+            if (item.payment === "Наличные") {
+                cash = Number(item.total);
+            }
 
-        if(item.payment=="Наличные")
-            cash = item.total;
+            if (item.payment === "Карта") {
+                card = Number(item.total);
+            }
 
-        if(item.payment=="Карта")
-            card = item.total;
+            if (item.payment === "Telegram") {
+                tg = Number(item.total);
+            }
+        });
 
-        if(item.payment=="Telegram")
-            tg = item.total;
+        document.getElementById("cash").textContent = cash;
+        document.getElementById("card").textContent = card;
+        document.getElementById("tg").textContent = tg;
+        document.getElementById("total").textContent = cash + card + tg;
 
-    });
-
-    document.getElementById("cash").innerHTML = cash;
-    document.getElementById("card").innerHTML = card;
-    document.getElementById("tg").innerHTML = tg;
-    document.getElementById("total").innerHTML =
-        Number(cash)+Number(card)+Number(tg);
-
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось загрузить данные кассы.");
+    }
 }
 
-async function closeShift(){
-
-    if(!confirm("Закрыть смену и обнулить кассу?")){
+async function closeShift() {
+    if (!confirm("Закрыть смену и обнулить кассу?")) {
         return;
     }
 
-    await fetch("/api/close-shift",{
-        method:"POST"
-    });
+    try {
+        const response = await fetch("/api/close-shift", {
+            method: "POST"
+        });
 
-    alert("Смена закрыта");
+        if (!response.ok) {
+            throw new Error("Ошибка закрытия смены");
+        }
 
-    loadCash();
+        alert("Смена успешно закрыта.");
 
+        await loadCash();
+
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось закрыть смену.");
+    }
 }
 
 loadCash();

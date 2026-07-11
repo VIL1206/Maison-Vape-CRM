@@ -1,52 +1,69 @@
-async function loadProducts(){
+async function loadProducts() {
+    try {
+        const response = await fetch("/api/products");
 
-    const response = await fetch("/api/products");
+        if (!response.ok) {
+            throw new Error("Не удалось загрузить товары");
+        }
 
-    const products = await response.json();
+        const products = await response.json();
 
-    let html="";
+        const productSelect = document.getElementById("product");
 
-    products.forEach(product=>{
+        productSelect.innerHTML = products.map(product => `
+            <option value="${product.id}">
+                ${product.name}
+            </option>
+        `).join("");
 
-        html+=`
-        <option value="${product.id}">
-        ${product.name}
-        </option>
-        `;
-
-    });
-
-    document.getElementById("product").innerHTML=html;
-
+    } catch (error) {
+        console.error(error);
+        alert("Ошибка загрузки товаров.");
+    }
 }
 
-async function acceptDelivery(){
+async function acceptDelivery() {
 
-    await fetch("/api/delivery",{
+    const product = document.getElementById("product");
+    const quantity = document.getElementById("quantity");
+    const supplier = document.getElementById("supplier");
 
-        method:"POST",
+    if (!quantity.value || Number(quantity.value) <= 0) {
+        alert("Введите корректное количество.");
+        return;
+    }
 
-        headers:{
-            "Content-Type":"application/json"
-        },
+    if (!supplier.value.trim()) {
+        alert("Введите поставщика.");
+        return;
+    }
 
-        body:JSON.stringify({
+    try {
+        const response = await fetch("/api/delivery", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                productId: Number(product.value),
+                quantity: Number(quantity.value),
+                supplier: supplier.value.trim()
+            })
+        });
 
-            productId:Number(product.value),
+        if (!response.ok) {
+            throw new Error("Ошибка приема товара");
+        }
 
-            quantity:Number(quantity.value),
+        alert("Товар успешно принят!");
 
-            supplier:supplier.value
+        quantity.value = "";
+        supplier.value = "";
 
-        })
-
-    });
-
-    alert("Товар успешно принят!");
-
-    quantity.value="";
-    supplier.value="";
-
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось принять товар.");
+    }
 }
 
 loadProducts();

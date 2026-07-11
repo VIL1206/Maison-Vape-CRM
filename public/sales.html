@@ -1,132 +1,120 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta charset="UTF-8">
-<title>Продажа</title>
+    <title>Продажа</title>
 
-<style>
+    <style>
+        body {
+            background: #1f2937;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
 
-body{
-    background:#1f2937;
-    color:white;
-    font-family:Arial;
-    margin:30px;
-}
+        h1,
+        h2 {
+            text-align: center;
+        }
 
-input{
-    width:100%;
-    padding:12px;
-    font-size:18px;
-    border:none;
-    border-radius:8px;
-    margin-bottom:20px;
-}
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
 
-table{
-    width:100%;
-    border-collapse:collapse;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
 
-th,td{
-    border:1px solid #555;
-    padding:12px;
-    text-align:center;
-}
+        th,
+        td {
+            border: 1px solid #555;
+            padding: 12px;
+            text-align: center;
+        }
 
-th{
-    background:#374151;
-}
+        th {
+            background: #374151;
+        }
 
-button{
-    padding:10px 20px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    background:#2563eb;
-    color:white;
-}
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            transition: background 0.2s;
+        }
 
-button:hover{
-    background:#1d4ed8;
-}
+        button:hover {
+            background: #1d4ed8;
+        }
 
-#total{
-    margin-top:20px;
-    font-size:28px;
-    font-weight:bold;
-}
-
-</style>
-
+        #total {
+            margin-top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: right;
+        }
+    </style>
 </head>
 
 <body>
 
-<h1>🛒 Продажа</h1>
+    <h1>🛒 Продажа</h1>
 
-<input
-id="search"
-placeholder="Введите название товара..."
-onkeyup="searchProduct()">
+    <input
+        id="search"
+        type="text"
+        placeholder="Введите название товара..."
+        onkeyup="searchProduct()">
 
-<table>
+    <table>
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Остаток</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
 
-<thead>
+        <tbody id="list"></tbody>
+    </table>
 
-<tr>
+    <h2>🛒 Корзина</h2>
 
-<th>Название</th>
-<th>Цена</th>
-<th>Остаток</th>
-<th></th>
+    <table>
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Цена</th>
+            </tr>
+        </thead>
 
-</tr>
+        <tbody id="cart"></tbody>
+    </table>
 
-</thead>
+    <div id="total">
+        Итого: 0 грн
+    </div>
 
-<tbody id="list">
+    <button onclick="checkout()">
+        💵 Продать
+    </button>
 
-</tbody>
-
-</table>
-
-<h2 style="margin-top:40px;">🛒 Корзина</h2>
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Название</th>
-<th>Цена</th>
-
-</tr>
-
-</thead>
-
-<tbody id="cart">
-
-</tbody>
-
-</table>
-
-<div id="total">
-
-Итого: 0 грн
-
-</div>
-
-<br>
-
-<button onclick="checkout()">
-
-💵 Продать
-
-</button>
-
-<script src="sales.js"></script>
+    <script src="sales.js"></script>
 
 </body>
+
 </html>

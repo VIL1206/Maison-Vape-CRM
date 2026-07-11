@@ -83,23 +83,28 @@ th{
 
 <button onclick="addProduct()">Добавить товар</button>
 
+<button onclick="addProduct()">
+    Добавить товар
+</button>
+
+<input
+    id="search"
+    type="text"
+    placeholder="🔍 Поиск по названию или штрихкоду"
+    onkeyup="searchProducts()"
+    style="width:100%;margin-top:20px;margin-bottom:20px;padding:12px;border-radius:8px;border:none;font-size:16px;box-sizing:border-box;">
+
 <table>
 
 <thead>
 
-<input
-    id="search"
-    placeholder="🔍 Поиск по названию или штрихкоду"
-    onkeyup="searchProducts()"
-    style="width:100%;margin-top:20px;margin-bottom:20px;padding:12px;border-radius:8px;border:none;font-size:16px;">
-
 <tr>
-<th>ID</th>
-<th>Название</th>
-<th>Категория</th>
-<th>Остаток</th>
-<th>Продажа</th>
-<th>Действия</th>
+    <th>ID</th>
+    <th>Название</th>
+    <th>Категория</th>
+    <th>Остаток</th>
+    <th>Продажа</th>
+    <th>Действия</th>
 </tr>
 
 </thead>

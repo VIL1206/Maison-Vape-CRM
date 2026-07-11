@@ -1,27 +1,33 @@
-async function loadHistory(){
+async function loadHistory() {
+    try {
+        const response = await fetch("/api/history");
 
-    const response = await fetch("/api/history");
+        if (!response.ok) {
+            throw new Error("Ошибка загрузки истории");
+        }
 
-    const data = await response.json();
+        const data = await response.json();
 
-    const table = document.getElementById("historyTable");
+        const tbody = document.querySelector("#historyTable tbody");
 
-    data.forEach(item=>{
+        tbody.innerHTML = "";
 
-        table.innerHTML += `
-        <tr>
+        data.forEach(item => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.closedAt}</td>
+                    <td>${item.cash} грн</td>
+                    <td>${item.card} грн</td>
+                    <td>${item.telegram} грн</td>
+                    <td><strong>${item.total} грн</strong></td>
+                </tr>
+            `;
+        });
 
-            <td>${item.closedAt}</td>
-            <td>${item.cash} грн</td>
-            <td>${item.card} грн</td>
-            <td>${item.telegram} грн</td>
-            <td><b>${item.total} грн</b></td>
-
-        </tr>
-        `;
-
-    });
-
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось загрузить историю смен.");
+    }
 }
 
 loadHistory();

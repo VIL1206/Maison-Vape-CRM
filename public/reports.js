@@ -1,39 +1,36 @@
-async function loadReport(){
+async function loadReport() {
+    try {
+        const response = await fetch("/api/report");
 
-    const response = await fetch("/api/report");
+        if (!response.ok) {
+            throw new Error("Ошибка загрузки отчета");
+        }
 
-    const sales = await response.json();
+        const sales = await response.json();
 
-    let html = "";
+        let html = "";
+        let total = 0;
 
-    let total = 0;
+        sales.forEach(sale => {
+            html += `
+                <tr>
+                    <td>${sale.date}</td>
+                    <td>${sale.productName}</td>
+                    <td>${sale.price} грн</td>
+                    <td>${sale.payment}</td>
+                </tr>
+            `;
 
-    sales.forEach(sale=>{
+            total += Number(sale.price);
+        });
 
-        html += `
+        document.getElementById("sales").innerHTML = html;
+        document.getElementById("sum").textContent = total;
 
-        <tr>
-
-        <td>${sale.date}</td>
-
-        <td>${sale.productName}</td>
-
-        <td>${sale.price}</td>
-
-        <td>${sale.payment}</td>
-
-        </tr>
-
-        `;
-
-        total += Number(sale.price);
-
-    });
-
-    document.getElementById("sales").innerHTML = html;
-
-    document.getElementById("sum").innerHTML = total;
-
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось загрузить отчет.");
+    }
 }
 
 loadReport();

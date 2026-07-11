@@ -3,27 +3,33 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>История смен</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>История смен</h1>
+    <h1>📋 История смен</h1>
 
-<table border="1" width="100%" id="historyTable">
+    <table id="historyTable" border="1" width="100%">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Наличные</th>
+                <th>Карта</th>
+                <th>Telegram</th>
+                <th>Итого</th>
+            </tr>
+        </thead>
 
-<tr>
-    <th>Дата</th>
-    <th>Наличные</th>
-    <th>Карта</th>
-    <th>Telegram</th>
-    <th>Итого</th>
-</tr>
+        <tbody>
+            <!-- Сюда history.js будет добавлять строки -->
+        </tbody>
+    </table>
 
-</table>
-
-<script src="history.js"></script>
+    <script src="history.js"></script>
 
 </body>
+
 </html>

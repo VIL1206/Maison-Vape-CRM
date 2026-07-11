@@ -1,41 +1,41 @@
-async function loadDashboard(){
+async function loadDashboard() {
+    try {
+        // Загружаем товары
+        const productsResponse = await fetch("/api/products");
 
-    // Количество товаров
+        if (!productsResponse.ok) {
+            throw new Error("Ошибка загрузки товаров");
+        }
 
-    let response = await fetch("/api/products");
+        const products = await productsResponse.json();
 
-    let products = await response.json();
+        document.getElementById("productsCount").textContent = products.length;
 
-    document.getElementById("productsCount").innerHTML =
-        products.length;
+        const lowStock = products.filter(product => Number(product.quantity) <= 3);
 
-    // Заканчиваются
+        document.getElementById("lowStock").textContent = lowStock.length;
 
-    let low = products.filter(p=>p.quantity<=3);
+        // Загружаем продажи
+        const salesResponse = await fetch("/api/report");
 
-    document.getElementById("lowStock").innerHTML =
-        low.length;
+        if (!salesResponse.ok) {
+            throw new Error("Ошибка загрузки продаж");
+        }
 
-    // Продажи
+        const sales = await salesResponse.json();
 
-    response = await fetch("/api/report");
+        document.getElementById("salesCount").textContent = sales.length;
 
-    let sales = await response.json();
+        const total = sales.reduce((sum, sale) => {
+            return sum + Number(sale.price);
+        }, 0);
 
-    document.getElementById("salesCount").innerHTML =
-        sales.length;
+        document.getElementById("todaySales").textContent = `${total} грн`;
 
-    let total = 0;
-
-    sales.forEach(s=>{
-
-        total += Number(s.price);
-
-    });
-
-    document.getElementById("todaySales").innerHTML =
-        total + " грн";
-
+    } catch (error) {
+        console.error(error);
+        alert("Не удалось загрузить данные панели управления.");
+    }
 }
 
 loadDashboard();
